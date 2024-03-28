@@ -31,7 +31,8 @@ class ParseDataService
     }
 
 
-    function writeDataToFile($data, $format, $filename) {
+    function writeDataToFile($data, $format, $filename): void
+    {
         switch ($format) {
             case 'csv':
                 $file = fopen($filename, 'w');
@@ -63,9 +64,6 @@ class ParseDataService
         }
     }
 
-    public function getDownloadLink()
-    {
-    }
 
     public function convert(array $data): array
     {
@@ -85,15 +83,5 @@ class ParseDataService
         }
 
         return $handledData;
-    }
-
-
-    // Function to get column indices by name
-    function getColumnIndices($headerRow) {
-        $indices = [];
-        foreach ($headerRow as $index => $columnName) {
-            $indices[$columnName] = $index;
-        }
-        return $indices;
     }
 }

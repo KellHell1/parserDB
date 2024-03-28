@@ -32,6 +32,7 @@ class DatabaseDumpService
         return $fileNames;
     }
 
+
     public function getPostsDataFromFileInDirectory(string $fileName): array
     {
         $sqlDump = file_get_contents("$this->dumpsFolder/$fileName");
@@ -56,6 +57,7 @@ class DatabaseDumpService
 
         return $insertData ?? [];
     }
+
 
     public function addFileToDirectory($file): bool
     {
