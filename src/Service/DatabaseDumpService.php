@@ -47,9 +47,8 @@ readonly class DatabaseDumpService
                 $tableNameInCommand = $matches[1] ?? '';
 
                 // Check if the table name ends with 'posts'
-                if (substr_compare($tableNameInCommand, 'posts', -strlen('posts')) === 0) {
+                if (str_contains($tableNameInCommand, 'posts')) {
                     $insertData = $this->extractDataFromInsert($command);
-
                 }
             }
         }

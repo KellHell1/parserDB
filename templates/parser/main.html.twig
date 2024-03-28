@@ -17,6 +17,16 @@
         {% endfor %}
     </select>
     <br>
+
+    <!-- Добавленный мульти-селект с форматами -->
+    <label for="formatSelect">Select Formats:</label>
+    <select id="formatSelect" name="formats[]" multiple>
+        <option value="csv">CSV</option>
+        <option value="xml">XML</option>
+        <option value="txt">TXT</option>
+    </select>
+    <br>
+
     <button type="submit">Parse Selected Databases</button>
 </form>
 

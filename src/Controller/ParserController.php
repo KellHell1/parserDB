@@ -31,6 +31,7 @@ class ParserController extends AbstractController
     public function parseDumpData(Request $request, DatabaseDumpService $databaseDumpService, ParseDataService $parseDataService): Response
     {
         $dumpFiles = $request->get('databases');
+        $formats = $request->get('formats');
 
         $data = [];
         foreach ($dumpFiles as $file) {
@@ -40,9 +41,9 @@ class ParserController extends AbstractController
         // Process extracted data (e.g., save to database, manipulate, etc.)
         $parsedData = $parseDataService->convert($data);
 
-        $format = 'txt';
-
-        $parseDataService->writeDataToFile($parsedData, $format, "uploads/files/test.$format");
+        foreach ($formats as $format) {
+            $parseDataService->writeDataToFile($parsedData, $format, "uploads/files/test.$format");
+        }
 
         return new Response('hi');
     }

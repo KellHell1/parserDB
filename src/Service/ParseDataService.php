@@ -3,10 +3,9 @@
 namespace App\Service;
 
 
-use PDO;
-use PDOException;
+use SimpleXMLElement;
 
-readonly class ParseDataService
+class ParseDataService
 {
     public function __construct(
         private string $filesFolder,
