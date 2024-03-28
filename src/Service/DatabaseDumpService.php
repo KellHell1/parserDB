@@ -97,22 +97,48 @@ class DatabaseDumpService
         $end = strrpos($insertQuery, ")");
         $valuesSubstring = substr($insertQuery, $start, $end - $start);
 
-        // Разбиваем строку по значениям в скобках
-        $valuesArray = explode("),", $valuesSubstring);
+        // Парсинг значений с учётом тегов HTML
+        $valuesArray = [];
+        $inQuotes = false;
+        $currentValue = '';
+        $depth = 0;
+        for ($i = 0; $i < strlen($valuesSubstring); $i++) {
+            $char = $valuesSubstring[$i];
+            if ($char == "'" && ($i == 0 || $valuesSubstring[$i - 1] != "\\")) {
+                $inQuotes = !$inQuotes;
+            }
+            if ($char == '(' && !$inQuotes) {
+                $depth++;
+            }
+            if ($char == ')' && !$inQuotes) {
+                $depth--;
+            }
+            if ($char == ',' && !$inQuotes && $depth == 0) {
+                $valuesArray[] = $currentValue;
+                $currentValue = '';
+            } else {
+                $currentValue .= $char;
+            }
+        }
+        $valuesArray[] = $currentValue;
 
         // Удаляем лишние символы и разделяем значения
         foreach ($valuesArray as &$value) {
-            $value = str_replace(array('(', ')', "\t"), '', $value);
-            $value = explode(',', $value);
+            $value = trim($value, ", \t\n\r\0\x0B");
+            $value = preg_replace('/\s+/', ' ', $value); // Заменяем последовательности пробелов на одиночные
+            $value = preg_replace('/(?<!\\\\)\\\\(?![\'"])|(?<=\\\\\\\\)\\\\(?![\'"])/', '', $value); // Удаляем экранирование, кроме экранирования кавычек
+            $value = preg_split('/,(?=(?:[^\'"]|\'[^\']*\'|"[^"]*")*$)/', $value); // Разбиваем строку по запятым, не находящимся внутри кавычек
+            $value = array_map(function($item) {
+                return trim($item, ", \t\n\r\0\x0B'\"");
+            }, $value);
         }
 
         // Создаем ассоциативные массивы, используя названия полей в качестве ключей
         $result = array();
-        unset($value);
         foreach ($valuesArray as $value) {
             $row = array();
             foreach ($fields as $index => $field) {
-                $row[$field] = trim($value[$index]);
+                $row[$field] = isset($value[$index]) ? $value[$index] : null;
             }
             $result[] = $row;
         }
