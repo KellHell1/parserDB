@@ -5,9 +5,10 @@
     <title>Database Parser</title>
 </head>
 <body>
+
 <h1>Database Parser</h1>
 
-<!-- Додайте ідентифікатор до форми -->
+<!-- Выбор базы для дампа -->
 <form id="databaseForm" action="/parse/dump" method="post">
     <h2>Select Databases</h2>
     <select id="databaseSelect" name="databases[]" multiple>
@@ -19,85 +20,6 @@
     <button type="submit">Parse Selected Databases</button>
 </form>
 
-<form id="databaseForm" action="/parse/dump" method="post">
-    <h2>Select Databases</h2>
-    <select id="databaseSelect" name="databases[]" multiple>
-        <?php foreach ($allDumps as $database): ?>
-        <option value="<?= $database ?>"><?= $database ?></option>
-        <?php endforeach; ?>
-    </select>
-    <br>
-    <button type="button" onclick="submitForm()">Parse Selected Databases</button>
-</form>
-
-<form id="databaseForm" action="/parse/dump" method="get">
-    <h2>Select Databases</h2>
-    <select id="databaseSelect" name="selectedDatabase" multiple>
-        <?php foreach ($allDumps as $database): ?>
-        <option value="<?= $database ?>"><?= $database ?></option>
-        <?php endforeach; ?>
-    </select>
-    <br>
-    <button type="button" onclick="submitForm()">Parse Selected Databases</button>
-</form>
-
-<form id="databaseForm" action="/parse/dump" method="post">
-    <h2>Select Databases</h2>
-    <select id="databaseSelect" name="selectedDatabase[]" multiple>
-        <?php foreach ($allDumps as $database): ?>
-        <option value="<?= $database ?>"><?= $database ?></option>
-        <?php endforeach; ?>
-    </select>
-    <br>
-    <button type="button" onclick="submitForm()">Parse Selected Databases</button>
-</form>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Send Data</title>
-</head>
-<body>
-
-
-<h2>Select Databases</h2>
-<select id="databaseSelect" multiple>
-    <!-- Options are populated dynamically -->
-</select>
-<br>
-<button onclick="sendData()">Send Data</button>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Send Data</title>
-</head>
-<body>
-<h2>Select Databases</h2>
-<select id="databaseSelect" multiple>
-    <!-- Options are populated dynamically -->
-</select>
-<br>
-<button onclick="sendData()">Send Data</button>
-
-<form action="{{ path('parse_dump') }}" method="post">
-    <label for="dump_files">Выберите файлы для парсинга:</label><br>
-    <select name="selected_files[]" id="dump_files" multiple>
-        {% for dump_file in allDumps %}
-            <option value="{{ dump_file }}">{{ dump_file }}</option>
-        {% endfor %}
-    </select><br>
-    <button type="submit">Отправить</button>
-</form>
-
-
-
-
-
 
 
 {# Form for uploading new dumps #}
@@ -107,6 +29,7 @@
     <br>
     <button type="submit">Upload</button>
 </form>
+
 
 {# List of available databases #}
 <h2>Available Databases</h2>

@@ -15,7 +15,8 @@
         "symfony/framework-bundle": "6.0.*",
         "symfony/runtime": "6.0.*",
         "symfony/twig-bundle": "6.0.*",
-        "symfony/yaml": "6.0.*"
+        "symfony/yaml": "6.0.*",
+        "ext-pdo": "*"
     },
     "config": {
         "allow-plugins": {

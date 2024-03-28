@@ -20,7 +20,7 @@ class ParserController extends AbstractController
     ) {
     }
 
-    #[Route('/test')]
+    #[Route('/')]
     public function main(DatabaseDumpService $databaseDumpService): Response
     {
         $allDumps = $databaseDumpService->getAllFilesInDirectory();
@@ -32,38 +32,25 @@ class ParserController extends AbstractController
     #[Route('/parse/dump', name: 'parse_dump', methods: ['POST'])]
     public function parseDumpData(Request $request, DatabaseDumpService $databaseDumpService): Response
     {
-        // databases
         $dumpFiles = $request->get('databases');
-        dd($dumpFiles);
-
-        // Читаємо вміст SQL-дампу з файлу
-        $sqlDumpContent = file_get_contents('uploads/dumps/db1.sql');
-
-        // Розбиваємо на окремі SQL-запити
-        $sqlQueries = explode(';', $sqlDumpContent);
 
         // Підключаємося до бази даних
         $dsn = 'mysql:host=database:3306;dbname=test';
         $username = 'symfony';
         $password = 'symfony';
 
-        try {
-            $pdo = new PDO($dsn, $username, $password);
-        } catch (PDOException $e) {
-            echo 'Помилка підключення: ' . $e->getMessage();
-            die();
-        }
+        $pdo = new PDO($dsn, $username, $password);
 
-        // MySQL dump command
-        $command = "mysqldump --host={database:3306} --user={$username} --password={$password} {test} > uploads/dumps/db1.sql";
+        foreach ($dumpFiles as $file) {
+            try {
+                $pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+                $query = file_get_contents("uploads/dumps/$file");
+                $pdo->exec($query);
 
-        // Execute the command
-        $output = shell_exec($command);
-
-        if ($output === null) {
-            echo "Database dump successful.";
-        } else {
-            echo "Error creating database dump: $output";
+            } catch (PDOException $e) {
+                echo 'Помилка підключення: ' . $e->getMessage();
+                die();
+            }
         }
 
         // Закриваємо з'єднання з базою даних
