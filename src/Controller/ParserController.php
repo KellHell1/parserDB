@@ -34,33 +34,19 @@ class ParserController extends AbstractController
     {
         $dumpFiles = $request->get('databases');
 
-        // Підключаємося до бази даних
-        $dsn = 'mysql:host=database:3306;dbname=test';
-        $username = 'symfony';
-        $password = 'symfony';
-
-        $pdo = new PDO($dsn, $username, $password);
-
+        $data = [];
         foreach ($dumpFiles as $file) {
-            try {
-                $pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-                $query = file_get_contents("uploads/dumps/$file");
-                $pdo->exec($query);
-
-            } catch (PDOException $e) {
-                echo 'Помилка підключення: ' . $e->getMessage();
-                die();
-            }
+            $data[] = $databaseDumpService->getPostsDataFromFileInDirectory($file);
         }
 
-        // Закриваємо з'єднання з базою даних
-        $pdo = null;
+        // Process extracted data (e.g., save to database, manipulate, etc.)
+        var_dump($data); // Output the extracted data
 
         return new Response('hi');
     }
 
     #[Route('/add/dump')]
-    public function addDump(): Response
+    public function uploadDump(): Response
     {
         return new Response('hi');
     }

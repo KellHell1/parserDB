@@ -31,16 +31,30 @@ readonly class DatabaseDumpService
         return $fileNames;
     }
 
-    public function getOneFileInDirectory(string $fileName): ?string
+    public function getPostsDataFromFileInDirectory(string $fileName): array
     {
-        $filePath = $this->dumpsFolder . '/' . $fileName;
+        $sqlDump = file_get_contents("$this->dumpsFolder/$fileName");
 
-        if (is_file($filePath)) {
-            return file_get_contents($filePath);
+        // Split SQL commands
+        $commands = explode(';', $sqlDump);
+
+        // Iterate through each command
+        foreach ($commands as $command) {
+            // Look for INSERT statements
+            if (stripos($command, 'INSERT INTO') !== false) {
+                // Extract table name from INSERT statement
+                preg_match('/INSERT INTO `([^`]*)`/', $command, $matches);
+                $tableNameInCommand = $matches[1] ?? '';
+
+                // Check if the table name ends with 'posts'
+                if (substr_compare($tableNameInCommand, 'posts', -strlen('posts')) === 0) {
+                    $insertData = $this->extractDataFromInsert($command);
+
+                }
+            }
         }
 
-        // File not found
-        return null;
+        return $insertData ?? [];
     }
 
     public function addFileToDirectory(string $directory, string $fileName, $fileContent): bool
@@ -61,5 +75,33 @@ readonly class DatabaseDumpService
             // Handle the exception if any
             return false; // Failed to add the file
         }
+    }
+
+    // Function to extract data from INSERT statements
+    function extractDataFromInsert($insertStatement): array
+    {
+        // Extract the values part of the INSERT statement
+        preg_match('/\((.*?)\)/', $insertStatement, $matches);
+        $values = $matches[1];
+
+        // Split the values into an array
+        $valuesArray = explode('),(', $values);
+
+        // Iterate through each value set and extract data
+        $data = [];
+        foreach ($valuesArray as $valueSet) {
+            // Remove parentheses and split values by comma
+            $values = explode(',', $valueSet);
+
+            // Clean each value (remove quotes and trim)
+            $cleanedValues = [];
+            foreach ($values as $value) {
+                $cleanedValues[] = trim(trim($value, "'"), '"');
+            }
+
+            $data[] = $cleanedValues;
+        }
+
+        return $data;
     }
 }
