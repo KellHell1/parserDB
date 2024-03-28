@@ -44,10 +44,9 @@
 
 
 {# Form for uploading new dumps #}
-<form action="/upload" method="post" enctype="multipart/form-data">
-    <h2>Upload Databases</h2>
-    <input type="file" name="database[]" multiple>
-    <br>
+<h2>Upload Files</h2>
+<form action="/add/dump" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" multiple>
     <button type="submit">Upload</button>
 </form>
 

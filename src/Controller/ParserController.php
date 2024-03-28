@@ -50,8 +50,12 @@ class ParserController extends AbstractController
     }
 
     #[Route('/add/dump')]
-    public function uploadDump(): Response
+    public function uploadDump(Request $request, DatabaseDumpService $databaseDumpService): Response
     {
-        return new Response('hi');
+        foreach ($request->files->all() as $file) {
+            $databaseDumpService->addFileToDirectory($file);
+        }
+
+        return new Response('success', 200);
     }
 }

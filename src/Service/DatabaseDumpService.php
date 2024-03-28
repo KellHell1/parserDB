@@ -5,6 +5,7 @@ namespace App\Service;
 
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\File;
 
 class DatabaseDumpService
@@ -56,28 +57,29 @@ class DatabaseDumpService
         return $insertData ?? [];
     }
 
-    public function addFileToDirectory(string $directory, string $fileName, $fileContent): bool
+    public function addFileToDirectory($file): bool
     {
-        $filesystem = new Filesystem();
-        $filePath = $directory . '/' . $fileName;
+        $fileName = $file->getClientOriginalName();
 
-        // Check if the file already exists
-        if ($filesystem->exists($filePath)) {
-            return false; // File already exists, return false
-        }
-
-        // Write the file content to the specified directory
+        // Move the file to the desired directory
         try {
-            $filesystem->dumpFile($filePath, $fileContent);
-            return true; // File added successfully
-        } catch (\Exception $e) {
-            // Handle the exception if any
-            return false; // Failed to add the file
+            $file->move(
+                $this->dumpsFolder, // Specify the directory where you want to save the uploaded files (defined in services.yaml or parameters.yml)
+                $fileName
+            );
+
+            // File uploaded successfully
+            return ('File uploaded successfully!');
+        } catch (FileException $e) {
+            // Handle file upload error
         }
+
+        return false;
     }
 
 
-    function extractDataFromInsert($insertQuery) {
+    function extractDataFromInsert($insertQuery): array
+    {
         // Извлекаем названия полей
         preg_match('/\((.*?)\)/', $insertQuery, $matches);
         $fields = explode(',', $matches[1]);
@@ -104,6 +106,7 @@ class DatabaseDumpService
 
         // Создаем ассоциативные массивы, используя названия полей в качестве ключей
         $result = array();
+        unset($value);
         foreach ($valuesArray as $value) {
             $row = array();
             foreach ($fields as $index => $field) {
