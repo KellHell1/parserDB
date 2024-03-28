@@ -77,31 +77,42 @@ readonly class DatabaseDumpService
         }
     }
 
-    // Function to extract data from INSERT statements
-    function extractDataFromInsert($insertStatement): array
-    {
-        // Extract the values part of the INSERT statement
-        preg_match('/\((.*?)\)/', $insertStatement, $matches);
-        $values = $matches[1];
 
-        // Split the values into an array
-        $valuesArray = explode('),(', $values);
+    function extractDataFromInsert($insertQuery) {
+        // Извлекаем названия полей
+        preg_match('/\((.*?)\)/', $insertQuery, $matches);
+        $fields = explode(',', $matches[1]);
 
-        // Iterate through each value set and extract data
-        $data = [];
-        foreach ($valuesArray as $valueSet) {
-            // Remove parentheses and split values by comma
-            $values = explode(',', $valueSet);
+        // Удаляем обратные кавычки из названий полей
+        $fields = array_map('trim', $fields);
+        $fields = array_map(function($field) {
+            return trim($field, '`');
+        }, $fields);
 
-            // Clean each value (remove quotes and trim)
-            $cleanedValues = [];
-            foreach ($values as $value) {
-                $cleanedValues[] = trim(trim($value, "'"), '"');
-            }
+        // Извлекаем значения в скобках после VALUES
+        $start = strpos($insertQuery, "VALUES") + strlen("VALUES");
+        $end = strrpos($insertQuery, ")");
+        $valuesSubstring = substr($insertQuery, $start, $end - $start);
 
-            $data[] = $cleanedValues;
+        // Разбиваем строку по значениям в скобках
+        $valuesArray = explode("),", $valuesSubstring);
+
+        // Удаляем лишние символы и разделяем значения
+        foreach ($valuesArray as &$value) {
+            $value = str_replace(array('(', ')', "\t"), '', $value);
+            $value = explode(',', $value);
         }
 
-        return $data;
+        // Создаем ассоциативные массивы, используя названия полей в качестве ключей
+        $result = array();
+        foreach ($valuesArray as $value) {
+            $row = array();
+            foreach ($fields as $index => $field) {
+                $row[$field] = trim($value[$index]);
+            }
+            $result[] = $row;
+        }
+
+        return $result;
     }
 }

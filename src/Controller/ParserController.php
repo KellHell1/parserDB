@@ -5,8 +5,6 @@ namespace App\Controller;
 
 use App\Service\DatabaseDumpService;
 use App\Service\ParseDataService;
-use PDO;
-use PDOException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,7 +28,7 @@ class ParserController extends AbstractController
 
 
     #[Route('/parse/dump', name: 'parse_dump', methods: ['POST'])]
-    public function parseDumpData(Request $request, DatabaseDumpService $databaseDumpService): Response
+    public function parseDumpData(Request $request, DatabaseDumpService $databaseDumpService, ParseDataService $parseDataService): Response
     {
         $dumpFiles = $request->get('databases');
 
@@ -40,7 +38,11 @@ class ParserController extends AbstractController
         }
 
         // Process extracted data (e.g., save to database, manipulate, etc.)
-        var_dump($data); // Output the extracted data
+        $parsedData = $parseDataService->convert($data);
+
+        $format = 'txt';
+
+        $parseDataService->writeDataToFile($parsedData, $format, "uploads/files/test.$format");
 
         return new Response('hi');
     }
