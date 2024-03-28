@@ -7,7 +7,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\File\File;
 
-readonly class DatabaseDumpService
+class DatabaseDumpService
 {
     public function __construct(
         private string $dumpsFolder,

@@ -31,6 +31,17 @@
 </form>
 
 
+<!-- Список файлов для скачивания -->
+<div>
+    <h2>Downloadable Files:</h2>
+    <ul>
+        {% for file in files %}
+            <li><a href="/uploads/files/{{ file }}" download>{{ file }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+
+
 
 {# Form for uploading new dumps #}
 <form action="/upload" method="post" enctype="multipart/form-data">
@@ -39,15 +50,6 @@
     <br>
     <button type="submit">Upload</button>
 </form>
-
-
-{# List of available databases #}
-<h2>Available Databases</h2>
-<ul>
-    {% for database in allDumps %}
-        <li>{{ database }}</li>
-    {% endfor %}
-</ul>
 
 </body>
 </html>

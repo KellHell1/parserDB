@@ -19,11 +19,12 @@ class ParserController extends AbstractController
     }
 
     #[Route('/')]
-    public function main(DatabaseDumpService $databaseDumpService): Response
+    public function main(DatabaseDumpService $databaseDumpService, ParseDataService $parseDataService): Response
     {
         $allDumps = $databaseDumpService->getAllFilesInDirectory();
+        $files = $parseDataService->getAllFilesInDirectory();
 
-        return $this->render('parser/main.html.twig', ['allDumps' => $allDumps]);
+        return $this->render('parser/main.html.twig', ['allDumps' => $allDumps, 'files' => $files]);
     }
 
 

@@ -4,12 +4,30 @@ namespace App\Service;
 
 
 use SimpleXMLElement;
+use Symfony\Component\Finder\Finder;
 
 class ParseDataService
 {
     public function __construct(
         private string $filesFolder,
     ) {
+    }
+
+    public function getAllFilesInDirectory(): array
+    {
+        $finder = new Finder();
+
+        $directory = $this->filesFolder;
+
+        $finder->files()->in($directory);
+
+        $fileNames = [];
+
+        foreach ($finder as $file) {
+            $fileNames[] = $file->getFilename();
+        }
+
+        return $fileNames;
     }
 
 
