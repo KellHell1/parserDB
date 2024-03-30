@@ -37,8 +37,14 @@ class DatabaseDumpService
     {
         $sqlDump = file_get_contents("$this->dumpsFolder/$fileName");
 
+        // Преобразуем HTML сущности обратно в символы
+        $sqlDump = html_entity_decode($sqlDump);
+
         // Split SQL commands
-        $commands = explode(';', $sqlDump);
+        $commands = explode('); ', $sqlDump);
+
+        $insertData = [];
+
 
         // Iterate through each command
         foreach ($commands as $command) {
@@ -49,8 +55,8 @@ class DatabaseDumpService
                 $tableNameInCommand = $matches[1] ?? '';
 
                 // Check if the table name ends with 'posts'
-                if (str_contains($tableNameInCommand, 'posts')) {
-                    $insertData = $this->extractDataFromInsert($command);
+                if (str_ends_with($tableNameInCommand, 'posts')) {
+                    $insertData[] = $this->extractDataFromInsert($command);
                 }
             }
         }
@@ -120,7 +126,6 @@ class DatabaseDumpService
                 $currentValue .= $char;
             }
         }
-        $valuesArray[] = $currentValue;
 
         // Удаляем лишние символы и разделяем значения
         foreach ($valuesArray as &$value) {
